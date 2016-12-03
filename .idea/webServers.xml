@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="sftp://dcabrera@127.0.0.1:12345/home/dcabrera/myvenv/bin/python3" name="sftp://dcabrera@127.0.0.1:12345/home/dcabrera/myvenv/bin/python3">
+        <fileTransfer host="127.0.0.1" port="12345" accessType="SFTP">
+          <option name="port" value="12345" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
