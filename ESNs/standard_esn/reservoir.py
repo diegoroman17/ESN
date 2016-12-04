@@ -6,7 +6,8 @@ class Reservoir(object):
     def __init__(self, reservoir_size=50, input_size=1,
                  alpha=0.5):
         """
-        Create random reservoir without feedback
+        Create random reservoir without feedback. The reservoir is dynamical respect to length of
+        time-series
         :param reservoir_size: number of neurons in the reservoir
         :type reservoir_size: int
         :param input_size: dimension of time-series input
@@ -19,6 +20,10 @@ class Reservoir(object):
         self.alpha = alpha
 
         self._inputs = tf.placeholder(tf.float32, shape=[None, input_size], name='inputs')
+        self._noise_min = tf.placeholder_with_default([0.], shape=[1,], name='noise_min')
+        self._noise_max = tf.placeholder_with_default([0.], shape=[1,], name='noise_max')
+        self._noise = tf.random_uniform([1], minval=self.noise_min, maxval=self.noise_max,
+                                        dtype=tf.float32, name='noise')
 
         self.W_input = tf.Variable(tf.random_uniform(shape=[input_size, reservoir_size],
                                                      minval=-1, maxval=1, dtype=tf.float32),
@@ -42,11 +47,12 @@ class Reservoir(object):
         :rtype: tensor
         """
         previous_state = tf.reshape(previous_state, [1, self.reservoir_size])
+
         input_n = tf.reshape(input_n, [1, self.input_size])
 
         with tf.variable_scope('reservoir_block'):
             state = tf.reshape(
-                tf.tanh(tf.matmul(previous_state, self.W) + tf.matmul(input_n, self.W_input)),
+                tf.tanh(tf.matmul(previous_state, self.W) + tf.matmul(input_n, self.W_input) + self.noise),
                 [self.reservoir_size], name='state')
 
         return state
@@ -68,6 +74,18 @@ class Reservoir(object):
     @property
     def inputs(self):
         return self._inputs
+
+    @property
+    def noise(self):
+        return self._noise
+
+    @property
+    def noise_min(self):
+        return self._noise_min
+
+    @property
+    def noise_max(self):
+        return self._noise_max
 
     @property
     def states(self):

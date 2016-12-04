@@ -2,7 +2,18 @@ import numpy as np
 
 
 class Benchmark(object):
+    # TODO-diego Add more benchmarks
     def __init__(self, train_length=2000, test_length=2000, delay=1):
+        """
+        Create a train and test data to predict a Mackey Glass non-linear dynamical system
+        with T=17
+        :param train_length: length of time-series to train
+        :type train_length: int
+        :param test_length: length of time-series to test
+        :type test_length: int
+        :param delay: time steps ahead to predict
+        :type delay: int
+        """
         self.train_length = train_length
         self.test_length = test_length
         self.delay = delay

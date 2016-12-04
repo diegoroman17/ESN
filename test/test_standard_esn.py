@@ -24,22 +24,27 @@ def train_and_test(sess, reservoir, readout, benchmark):
     # Train stage
     start_time = time.time()
     sess.run(tf.initialize_all_variables())
-    states = sess.run(reservoir.states, {reservoir.inputs: benchmark.train_input})
+    states = sess.run(reservoir.states, {reservoir.inputs: benchmark.train_input,
+                                         reservoir.noise_min:[-0.001], reservoir.noise_max:[0.001]})
+
     regr = Ridge(alpha=0.01)
     regr.fit(states, benchmark.train_target)
     sess.run([tf.assign(readout.W_out, np.transpose(regr.coef_)), tf.assign(readout.b, regr.intercept_)])
+
+    states = sess.run(reservoir.states, {reservoir.inputs: benchmark.train_input})
     loss_train = sess.run(readout.loss, {readout.states: states, readout.targets: benchmark.train_target})
-    print("At training stage %.6f s the loss is:" % (time.time() - start_time), loss_train)
+    print("At training stage %.2f s the loss is:" % (time.time() - start_time), loss_train)
+
     # Test stage
     start_time = time.time()
     states = sess.run(reservoir.states, {reservoir.inputs: benchmark.test_input})
     loss_test = sess.run(readout.loss, {readout.states: states, readout.targets: benchmark.test_target})
-    print("At testing stage %.6f s the loss is:" % (time.time() - start_time), loss_test)
+    print("At testing stage %.2f s the loss is:" % (time.time() - start_time), loss_test)
 
 
 def main():
-    reservoir_size = 250
-    benchmark = Benchmark()
+    reservoir_size = 100
+    benchmark = Benchmark(delay=5)
     reservoir = Reservoir(reservoir_size=reservoir_size)
     readout = Readout(reservoir_size=reservoir_size)
     sess = tf.Session()

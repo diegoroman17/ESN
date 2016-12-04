@@ -2,6 +2,7 @@
   <dictionary name="User">
     <words>
       <w>mackey</w>
+      <w>tensorflow</w>
     </words>
   </dictionary>
 </component>
