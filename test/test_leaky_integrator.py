@@ -5,7 +5,7 @@ import tensorflow as tf
 from ESNs.readout.standard import Readout
 from sklearn.linear_model import Ridge
 
-from ESNs.reservoir.standard import Reservoir
+from ESNs.reservoir.leaky_integrator import Reservoir
 from test.benchmark import Benchmark
 
 
