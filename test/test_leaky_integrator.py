@@ -25,7 +25,7 @@ def train_and_test(sess, reservoir, readout, benchmark):
     """
     # Train stage
     start_time = time.time()
-    sess.run(tf.initialize_all_variables())
+    sess.run(tf.global_variables_initializer())
     states = sess.run(reservoir.states, {reservoir.inputs: benchmark.train_input,
                                          reservoir.noise_min:[-0.001], reservoir.noise_max:[0.001]})
 

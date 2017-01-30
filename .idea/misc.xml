@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="IpnbSettings">
+    <option name="URL" value="http://127.0.0.1:8889" />
+  </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Remote Python 3.4.5 (sftp://dcabrera@127.0.0.1:12345/home/dcabrera/myvenv/bin/python3)" project-jdk-type="Python SDK" />
 </project>

@@ -36,6 +36,10 @@ class Reservoir(object):
                                                minval=-1, maxval=1, dtype=tf.float32),
                              dtype=tf.float32, name='W')
 
+        self.b = tf.Variable(tf.random_uniform(shape=[reservoir_size],
+                                               minval=-1, maxval=1, dtype=tf.float32),
+                             dtype=tf.float32, name='b')
+
         with tf.variable_scope('reservoir'):
             self._states = self._compute_states()
 
@@ -54,11 +58,11 @@ class Reservoir(object):
         input_n = tf.reshape(input_n, [1, self.input_size])
 
         with tf.variable_scope('reservoir_block'):
-            state = tf.reshape(
+            state = tf.add(tf.reshape(
                 tf.mul(previous_state, (1-self.alpha)) +
                 tf.tanh(tf.matmul(previous_state, tf.mul(self.W, self.rho)) +
                         tf.matmul(input_n, self.W_input) + self.noise),
-                [self.reservoir_size], name='state')
+                [self.reservoir_size]), self.b, name='state')
 
         return state
 

@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 import scipy.sparse.linalg
 import functools
+from ESNs.reservoir.standard import Reservoir
 
 
 def doublewrap(function):
@@ -45,7 +46,7 @@ def define_scope(function, scope=None, *args, **kwargs):
     return decorator
 
 
-class Reservoir(object):
+class ReservoirConceptor(Reservoir):
     def __init__(self, data, initial=None, reservoir_size=50,
                  i_scale=1.5, r_scale=1.5, b_scale=0.2, washout=100, prec=tf.float64):
         """
@@ -58,20 +59,12 @@ class Reservoir(object):
         :param alpha: spectral radius
         :type alpha: float
         """
-        self.data = data
-        if initial:
-            self.initial = initial
-        else:
-            self.initial = self._initial_state(reservoir_size, prec)
-        self._reservoir_size = reservoir_size
-        self._washout = washout
-        self._prec = prec
-
-        self._input_size = int(data.get_shape()[1])
-        self._input_weight, self._weight, self._bias = self._weights_and_bias(self._input_size,
-                                                                              reservoir_size,
-                                                                              i_scale, r_scale, b_scale,
-                                                                              prec)
+        Reservoir.__init__(self, data, initial=initial, reservoir_size=reservoir_size,
+                           i_scale=i_scale, r_scale=r_scale, b_scale=b_scale, washout=washout, prec=prec)
+        self.conceptor = self._initial_conceptor(reservoir_size, prec)
+        self.weight = self._weight
+        self.input_weight = self._input_weight
+        self.bias = self._bias
         self.compute
 
     @define_scope
@@ -82,11 +75,11 @@ class Reservoir(object):
         :rtype: list of tensors
         """
         initial_state = self.initial
-        states = tf.scan(self._reservoir_step, self.data,
+        states = tf.scan(self._reservoir_step_conceptor, self.data,
                          initializer=initial_state)
-        return tf.slice(states, [self._washout, 0], [-1, -1])
+        return states
 
-    def _reservoir_step(self, previous_state, input_n):
+    def _reservoir_step_conceptor(self, previous_state, input_n):
         """
         Reservoir step
         :param previous_state: previous state in the reservoir
@@ -98,33 +91,15 @@ class Reservoir(object):
         """
         previous_state = tf.reshape(previous_state, [1, self._reservoir_size])
         input_n = tf.reshape(input_n, [1, self._input_size])
-        bias = tf.reshape(self._bias, [1, self._reservoir_size])
+        bias = tf.reshape(self.bias, [1, self._reservoir_size])
 
-        state = tf.matmul(previous_state, self._weight) + tf.matmul(input_n, self._input_weight) + bias
+        state = tf.matmul(previous_state, self.weight) + tf.matmul(input_n, self.input_weight) + bias
         state = tf.tanh(state)
+        state = tf.matmul(state, self.conceptor)
         state = tf.reshape(state, [self._reservoir_size])
         return state
 
     @staticmethod
-    def _weights_and_bias(n_inputs, n_states, i_scale, r_scale, b_scale, prec=tf.float64):
-        input_weight = i_scale * tf.random_normal(shape=[n_inputs, n_states], dtype=prec)
-        bias = b_scale * tf.random_normal(shape=[n_states], dtype=prec)
-
-        def _gen_internal_weights(num_neuron, density):
-            weights = scipy.sparse.rand(m=num_neuron, n=num_neuron, density=density, format='coo')
-            eigen, _ = scipy.sparse.linalg.eigsh(weights, 1)
-            weights /= np.abs(eigen[0])
-            return weights.toarray()
-
-        if n_states < 20:
-            weight = _gen_internal_weights(n_states, 1)
-        else:
-            weight = _gen_internal_weights(n_states, 10. / n_states)
-
-        weight = weight * r_scale
-        return tf.Variable(input_weight), tf.Variable(weight, dtype=prec), tf.Variable(bias)
-
-    @staticmethod
-    def _initial_state(n_states, prec=tf.float64):
-        initial_state = tf.zeros([n_states], dtype=prec)
-        return initial_state
+    def _initial_conceptor(n_states, prec=tf.float64):
+        initial_conceptor = np.identity(n_states)
+        return tf.Variable(initial_conceptor, dtype=prec)

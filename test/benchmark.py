@@ -3,7 +3,7 @@ import numpy as np
 
 class Benchmark(object):
     # TODO-diego Add more benchmarks
-    def __init__(self, train_length=2000, test_length=2000, delay=1):
+    def __init__(self, train_length=1500, test_length=600, delay=1, fun='sine', f=8.):
         """
         Create a train and test data to predict a Mackey Glass non-linear dynamical system
         with T=17
@@ -17,9 +17,13 @@ class Benchmark(object):
         self.train_length = train_length
         self.test_length = test_length
         self.delay = delay
-
-        data = np.loadtxt('../data/MackeyGlass_t17.txt')
-        data = np.atleast_2d(data).T
+        if fun == 'mackey':
+            data = np.loadtxt('data/MackeyGlass_t17.txt')
+            data = np.atleast_2d(data).T
+        elif fun == 'sine':
+            x = np.arange(train_length + test_length + 2 * delay)
+            data = np.sin(2 * np.pi * x / f)
+            data = np.atleast_2d(data).T
 
         self._train_input = data[:train_length]
         self._train_target = data[delay:train_length + delay]
