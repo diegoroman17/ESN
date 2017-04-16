@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="sftp://dcabrera@127.0.0.1:12345/home/dcabrera/myvenv/bin/python3" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" autoUpload="Always" serverName="tunnel_mulhacen" autoUploadExternalChanges="true">
     <serverData>
       <paths name="Copy of project-level server 'mulhacen'">
         <serverdata>
@@ -16,13 +16,6 @@
           </mappings>
         </serverdata>
       </paths>
-      <paths name="sftp://dcabrera@127.0.0.1:12345/home/dcabrera/myvenv/bin/python3">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/home/dcabrera/Echo_State_Networks" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="titan">
         <serverdata>
           <mappings>
@@ -34,6 +27,13 @@
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="tunnel_mulhacen">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/dcabrera/Echo_State_Networks" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>

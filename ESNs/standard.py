@@ -80,6 +80,10 @@ class EsnNetwork(object):
     def error(self):
         return self._readout.error
 
+    @define_scope
+    def codification(self):
+        return self._readout.codification
+
     @staticmethod
     def _apply_washout(signal, washout):
         return tf.slice(signal, [washout, 0], [-1, -1])

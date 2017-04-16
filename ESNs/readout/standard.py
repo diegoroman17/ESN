@@ -62,6 +62,7 @@ class Readout(object):
         self.prediction
         self.error
         self.optimize
+        self.codification
 
     @define_scope
     def prediction(self):
@@ -88,6 +89,10 @@ class Readout(object):
         new_weights = tf.matmul(new_weights, tf.transpose(self.data))
         new_weights = tf.matmul(new_weights, self.target)
         return tf.assign(self._output_weights, new_weights)
+
+    @define_scope
+    def codification(self):
+        return self._output_weights
 
     @define_scope
     def error(self):
